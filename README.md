@@ -1,5 +1,5 @@
 # Madalico
-### A Google Apps script that will tell you when a specific part of a webpage has been changed
+### A Google Apps script that will tell you when a specific part of a web-page has been changed
 
 It will periodically fetch the web page you want, look at a specific element and will send you an email if that element was different the last time this script was executed  
 
