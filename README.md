@@ -5,7 +5,7 @@ It will periodically fetch the web page you want, look at a specific element and
 
 A large part of the code was taken from or inspired by [alessbelli/cron-supelec-ent](https://github.com/alessbelli/cron-supelec-ent/)  
 
-## Instructions for use:
+## Instructions for use
 1) Create a [Google Spreadsheet](https://docs.google.com/spreadsheets/) using your Google Account.
 2) Add a script to the page using Tools>Script Editor
 3) Edit the script, and paste the code from [Code.gs](Code.gs) in this repository.
