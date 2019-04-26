@@ -7,7 +7,7 @@ A large part of the code was taken from or inspired by [alessbelli/cron-supelec-
 
 ## Instructions for use
 1) Create a [Google Spreadsheet](https://docs.google.com/spreadsheets/) using your Google Account
-2) Fill in the sheet with the urls and paths of what you want to listen to (see [**Syntax of the sheet**](#syntax-of-the-sheet) below)
+2) Fill in the sheet with the urls and paths of what you want to listen to (see [Syntax of the sheet](#syntax-of-the-sheet) below)
 3) Add a script to the page using Tools>Script Editor, or create a project on [script.google.com](https://script.google.com/home)
 4) Edit the script, and paste the code from [Code.gs](Code.gs) in this repository
 5) If you created a new project instead of adding a script directly in the sheet, change the constant `sheetID` to the (spreadsheet ID)[https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id] of your sheet
