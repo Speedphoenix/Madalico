@@ -1,66 +1,70 @@
 // Most of the basic code of this script is taken from https://github.com/alessbelli/cron-supelec-ent (file code.gs)
 
-// A script to see when a specific part of a webpage has changed (so you don't have to F5 every day?)
-
-function hasItChanged()
-{
-  // the url of what you want to track
-  const url = "http://www.the-site-you-want-to-track.com/"; // "http://www.lineaamica.gov.it/risposte/carta-identita-elettronica-italiani-residenti-allestero";
-
-  // the path to the html element you want to catch
-  const checkPath = "/html/body"; // "/html/body/div[2]/div[2]/div/section/div/section/article/div[5]/div[2]/div/span";
-
-  // if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason, it will use the sheet with this ID
-  const sheetID = ""; // "15hKt3pPM-c0vnh0BDTGjx2IVecOhDVWV1xn6114xMqw";
-
-  // A string that will be used in the emails
-  const title = "";
+function checkChanges(){
+  // if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason
+  const sheetID = ""; // the sheet's ID here (you can find it in the url of the sheet)
   
-  // The receiving email address
-  const myEmail = "example@gmail.com";
-
-
-
-
-  var response, responseContent, sheet, oldVal, newVal, fullText;
-
-  // HTTP Response Code of the last server request
-  if (!ScriptProperties.getProperty("status")) {
-    ScriptProperties.setProperty("status", 200);
-  }
-
-  // Fetch the web page using UrlFetchApp
-  response = UrlFetchApp.fetch(url);
-  responseContent = response.getContentText("UTF-8"); // if needed
-
+  const email = Session.getActiveUser().getEmail();
+  
+  var sheet, url, checkPath, oldVal, newVal, title;
+  
   sheet = SpreadsheetApp.getActiveSheet();
   if (sheet === null) {
     sheet = SpreadsheetApp.openById(sheetID).getActiveSheet();
     if (sheet === null)
       throw "could not get a sheet";
   }
+  
+  var i = 2;
+  while (sheet.getRange(1, i).getValue() !== "") {
+    title = sheet.getRange(1, i).getValue();
+    url = sheet.getRange(2, i).getValue();
+    checkPath = sheet.getRange(3, i).getValue();
+    oldVal = sheet.getRange(4, i).getValue(); // the value that was previously entered
+    
+    try {
+      newVal = getVal(url, checkPath);
+    }
+    catch (error) {
+      if (true);
+      newVal = error.message;
+    }
+    
+    if (oldVal !== newVal) {
+      sheet.getRange(4, i).setValue(newVal);
+      
+      MailApp.sendEmail({
+        to: email,
+        subject: "The page has changed, or error caught (" + title + ")",
+        body: 'The page "' + title + '" has changed, or an error was caught:\n' + newVal + '\nold one was:\n' + oldVal
+      });
+      Logger.log("Mail sent (" + newVal + ")");
+    }
+    i++;
+  }
+}
 
+// to see when a specific part of a webpage has changed (so you don't have to F5 every day?)
 
-  oldVal = sheet.getRange('A1').getValue(); // the value that was previously entered
+function getVal(url, checkPath) {
+  
+  var response, responseContent, newVal, fullText;
+  
+  // HTTP Response Code of the last server request
+  if (!ScriptProperties.getProperty("status")) {
+    ScriptProperties.setProperty("status", 200);
+  }
+  
+  // Fetch the web page using UrlFetchApp
+  response = UrlFetchApp.fetch(url);
+  responseContent = response.getContentText("UTF-8"); // if needed
+  
   var inter = getDataFromXpath(checkPath, response)
   if (inter === null) {
-    newVal = "getDataFromXpath returned null, check path?";
-    throw "shouldn't be here";
+    return "getDataFromXpath returned null, check path?";
   }
   else {
-    newVal = inter.getText();
-  }
-
-
-  if (oldVal !== newVal) {
-    sheet.getRange('A1').setValue(newVal);
-
-    MailApp.sendEmail({
-      to: myEmail,
-      subject: "The page has changed, or error caught (" + title + ")",
-      body: 'The page "' + title + '" has changed, or an error was caught'
-    });
-    Logger.log("Mail sent (" + newVal + ")");
+    return inter.getText();
   }
 }
 
@@ -68,7 +72,7 @@ function hasItChanged()
 // Useful function to get an HTML element from its XPath, credits to @vs4vijay at https://coderwall.com/p/cq63og/extract-data-from-xpath-via-google-apps-script
 function getDataFromXpath(path, responseText) {
   var xmlDoc = Xml.parse(responseText, true);
-
+  
   // Replacing tbody tag because app script doesnt understand.
   path = path.replace("/html/","").replace("/tbody","","g");
   var tags = path.split("/");
