@@ -1,7 +1,7 @@
 // Most of the basic code of this script is taken from https://github.com/alessbelli/cron-supelec-ent (file code.gs)
 
-function checkChanges(){
-  // if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason
+function checkChanges() {
+  // provide the sheet's ID if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason
   const sheetID = ""; // the sheet's ID here (you can find it in the url of the sheet)
   
   const email = Session.getActiveUser().getEmail();
@@ -16,7 +16,7 @@ function checkChanges(){
   }
   
   var i = 2;
-  while (sheet.getRange(1, i).getValue() !== "") {
+  while (sheet.getRange(2, i).getValue() !== "") {
     title = sheet.getRange(1, i).getValue();
     url = sheet.getRange(2, i).getValue();
     checkPath = sheet.getRange(3, i).getValue();
