@@ -23,14 +23,18 @@ For each site (column) the cells correspond from top to bottom:
 - Optionally a title on  for what you are tracking (will be in the subjects of emails you will receive)
 - The url of the page to want to watch
 - The path to to the html element to watch in the page
-- The latest value that was watched. This is used by he script to compare with the new value, and then updated. It will be filled on the first run of the script
+- The latest value that was watched. This is used by he script to compare with the new value, and then updated. If empty, it will be filled on the first run of the script
+- The time and date of last non-error fetch, how recent the last value you have is
+- The latest error encountered (usually the web page could not be fetched)
 
 -|A|B
 -|-|-
-1|title:|Changes to the title Madalico in the repository name on github 
-2|url:|https://github.com/Speedphoenix/Madalico
-3|path:|/html/body/div[4]/div/main/div[1]/div/h1/strong/a
-4|latest value:|Madalico
+1|Title (optional):|Changes to the title Madalico in the repository name on github 
+2|Url:|https://github.com/Speedphoenix/Madalico
+3|Path:|/html/body/div[4]/div/main/div[1]/div/h1/strong/a
+4|Latest value:|Madalico
+5|Time of last non-error fetch:|2019-04-27 13:53:32
+6|Latest error:|
 
 See [this spreadsheet](https://docs.google.com/spreadsheets/d/1MasTLf3-_XS-Ji0UNaEkb3-qaARx6gpOF40jDxPph88/edit#gid=0) as an example
 
