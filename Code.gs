@@ -3,10 +3,16 @@
 function checkChanges() {
   // provide the sheet's ID if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason
   const sheetID = ""; // the sheet's ID here (you can find it in the url of the sheet)
+  const titleRow = 1;
+  const urlRow = 2;
+  const pathRow = 3;
+  const valueRow = 4;
+  const timeRow = 5;
+  const errorRow = 6;
   
   const email = Session.getActiveUser().getEmail();
   
-  var sheet, url, checkPath, oldVal, newVal, title;
+  var sheet, url, checkPath, oldVal, newVal, title, oldError, newError, isError;
   
   sheet = SpreadsheetApp.getActiveSheet();
   if (sheet === null) {
@@ -16,29 +22,48 @@ function checkChanges() {
   }
   
   var i = 2;
-  while (sheet.getRange(2, i).getValue() !== "") {
-    title = sheet.getRange(1, i).getValue();
-    url = sheet.getRange(2, i).getValue();
-    checkPath = sheet.getRange(3, i).getValue();
-    oldVal = sheet.getRange(4, i).getValue(); // the value that was previously entered
+  while (sheet.getRange(urlRow, i).getValue() !== "") {
+    title = sheet.getRange(titleRow, i).getValue();
+    url = sheet.getRange(urlRow, i).getValue();
+    checkPath = sheet.getRange(pathRow, i).getValue();
+    oldVal = sheet.getRange(valueRow, i).getValue(); // the value that was previously entered
+    oldError = sheet.getRange(errorRow, i).getValue();
+    isError = false;
     
     try {
       newVal = getVal(url, checkPath);
     }
     catch (error) {
-      if (true);
-      newVal = error.message;
+      newError = error.message;
+      isError = true;
     }
     
-    if (oldVal !== newVal) {
-      sheet.getRange(4, i).setValue(newVal);
-      
-      MailApp.sendEmail({
-        to: email,
-        subject: "The page has changed, or error caught (" + title + ")",
-        body: 'The page "' + title + '" has changed, or an error was caught:\n' + newVal + '\nold one was:\n' + oldVal
-      });
-      Logger.log("Mail sent (" + newVal + ")");
+    if (isError)
+    {
+      if (oldError !== newError)
+      {
+        sheet.getRange(errorRow, i).setValue(newError);
+        MailApp.sendEmail({
+          to: email,
+          subject: "A (different) error has been caught on the Madalico script (" + title + ")",
+          body: 'Caught an error while trying the page "' + title + '":\n' + newError + '\nold one was:\n' + oldError
+        });
+        Logger.log("Mail for the error sent (" + newError + ")");
+      } 
+    }
+    else
+    {
+      if (oldVal !== newVal) {
+        sheet.getRange(valueRow, i).setValue(newVal);
+        
+        MailApp.sendEmail({
+          to: email,
+          subject: "The page has changed (" + title + ")",
+          body: 'The page "' + title + '" has changed:\n' + newVal + '\nold one was:\n' + oldVal
+        });
+        Logger.log("Mail sent (" + title + ", " + newVal + ")");
+      }
+      sheet.getRange(timeRow, i).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
     }
     i++;
   }
