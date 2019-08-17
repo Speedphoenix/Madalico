@@ -8,11 +8,11 @@ function checkChanges() {
   const pathRow = 3;
   const valueRow = 4;
   const timeRow = 5;
-  const errorRow = 6;
+  const startErrorRow = 6;
   
   const email = Session.getActiveUser().getEmail();
   
-  var sheet, url, checkPath, oldVal, newVal, title, oldError, newError, isError;
+  var sheet, url, checkPath, oldVal, newVal, title, oldError, newError, isError, errorRow;
   
   sheet = SpreadsheetApp.getActiveSheet();
   if (sheet === null) {
@@ -27,7 +27,7 @@ function checkChanges() {
     url = sheet.getRange(urlRow, i).getValue();
     checkPath = sheet.getRange(pathRow, i).getValue();
     oldVal = sheet.getRange(valueRow, i).getValue(); // the value that was previously entered
-    oldError = sheet.getRange(errorRow, i).getValue();
+    
     isError = false;
     
     try {
@@ -40,7 +40,14 @@ function checkChanges() {
     
     if (isError)
     {
-      if (oldError !== newError)
+      errorRow = startErrorRow; 
+      oldError = sheet.getRange(errorRow, i).getValue();
+      while (oldError !== "" && oldError !== newError)
+      {
+        errorRow += 2;
+        oldError = sheet.getRange(errorRow, i).getValue();
+      }
+      if (oldError === "")
       {
         sheet.getRange(errorRow, i).setValue(newError);
         MailApp.sendEmail({
@@ -49,17 +56,19 @@ function checkChanges() {
           body: 'Caught an error while trying the page "' + title + '":\n' + newError + '\nold one was:\n' + oldError
         });
         Logger.log("Mail for the error sent (" + newError + ")");
-      } 
+      }
+      sheet.getRange(errorRow + 1, i).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
     }
     else
     {
+      errorRow = startErrorRow;
       if (oldVal !== newVal) {
         sheet.getRange(valueRow, i).setValue(newVal);
         
         MailApp.sendEmail({
           to: email,
           subject: "The page has changed (" + title + ")",
-          body: 'The page "' + title + '" has changed:\n' + newVal + '\nold one was:\n' + oldVal
+          body: 'The page "' + title + '" has changed:\n' + url + '\n' + newVal + '\nold one was:\n' + oldVal
         });
         Logger.log("Mail sent (" + title + ", " + newVal + ")");
       }
@@ -74,11 +83,6 @@ function checkChanges() {
 function getVal(url, checkPath) {
   
   var response, responseContent, newVal, fullText;
-  
-  // HTTP Response Code of the last server request
-  if (!ScriptProperties.getProperty("status")) {
-    ScriptProperties.setProperty("status", 200);
-  }
   
   // Fetch the web page using UrlFetchApp
   response = UrlFetchApp.fetch(url);
@@ -103,6 +107,7 @@ function getDataFromXpath(path, responseText) {
   var tags = path.split("/");
   var element = xmlDoc.getElement();
   for(var i in tags) {
+    
     var tag = tags[i];
     var index = tag.indexOf("[");
     if(index != -1) {
