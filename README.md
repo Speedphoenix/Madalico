@@ -1,4 +1,5 @@
 # Madalico
+> :warning: As of 2020-02-18 this project does not work anymore as the `Xml` class is not supported by Google App scripts anymore
 ### A Google Apps script that will tell you when a specific part of a web-page has been changed
 
 It will periodically fetch the web pages you want, look at a specific element and will send you an email if that element was different than the last time this script was executed.  
