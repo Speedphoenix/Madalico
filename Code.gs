@@ -2,17 +2,17 @@
 
 function checkChanges() {
   // provide the sheet's ID if this script is not attached to a sheet, or if SpreadsheetApp.getActiveSheet() does not work for some reason
-  const sheetID = ""; // the sheet's ID here (you can find it in the url of the sheet)
-  const titleRow = 1;
-  const urlRow = 2;
-  const pathRow = 3;
-  const valueRow = 4;
-  const timeRow = 5;
-  const startErrorRow = 6;
+  const sheetID = "15hKt3pPM-c0vnh0BDTGjx2IVecOhDVWV1xn6114xMqw"; // the sheet's ID here (you can find it in the url of the sheet)
+  const titleCol = 1;
+  const urlCol = 2;
+  const pathCol = 3;
+  const valueCol = 4;
+  const timeCol = 5;
+  const startErrorCol = 6;
   
   const email = Session.getActiveUser().getEmail();
   
-  var sheet, url, checkPath, oldVal, newVal, title, oldError, newError, isError, errorRow;
+  var sheet, url, checkPath, oldVal, newVal, title, oldError, newError, isError, errorCol;
   
   sheet = SpreadsheetApp.getActiveSheet();
   if (sheet === null) {
@@ -20,13 +20,14 @@ function checkChanges() {
     if (sheet === null)
       throw "could not get a sheet";
   }
+
   
   var i = 2;
-  while (sheet.getRange(urlRow, i).getValue() !== "") {
-    title = sheet.getRange(titleRow, i).getValue();
-    url = sheet.getRange(urlRow, i).getValue();
-    checkPath = sheet.getRange(pathRow, i).getValue();
-    oldVal = sheet.getRange(valueRow, i).getValue(); // the value that was previously entered
+  while (sheet.getRange(i, urlCol).getValue() !== "") {
+    title = sheet.getRange(i, titleCol).getValue();
+    url = sheet.getRange(i, urlCol).getValue();
+    checkPath = sheet.getRange(i, pathCol).getValue();
+    oldVal = sheet.getRange(i, valueCol).getValue(); // the value that was previously entered
     
     isError = false;
     
@@ -40,16 +41,16 @@ function checkChanges() {
     
     if (isError)
     {
-      errorRow = startErrorRow; 
-      oldError = sheet.getRange(errorRow, i).getValue();
+      errorCol = startErrorCol; 
+      oldError = sheet.getRange(i, errorCol).getValue();
       while (oldError !== "" && oldError !== newError)
       {
-        errorRow += 2;
-        oldError = sheet.getRange(errorRow, i).getValue();
+        errorCol += 2;
+        oldError = sheet.getRange(i, errorCol).getValue();
       }
       if (oldError === "")
       {
-        sheet.getRange(errorRow, i).setValue(newError);
+        sheet.getRange(i, errorCol).setValue(newError);
         MailApp.sendEmail({
           to: email,
           subject: "A (different) error has been caught on the Madalico script (" + title + ")",
@@ -57,13 +58,13 @@ function checkChanges() {
         });
         Logger.log("Mail for the error sent (" + newError + ")");
       }
-      sheet.getRange(errorRow + 1, i).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
+      sheet.getRange(i, errorCol + 1).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
     }
     else
     {
-      errorRow = startErrorRow;
+      errorCol = startErrorCol;
       if (oldVal !== newVal) {
-        sheet.getRange(valueRow, i).setValue(newVal);
+        sheet.getRange(i, valueCol).setValue(newVal);
         
         MailApp.sendEmail({
           to: email,
@@ -72,7 +73,7 @@ function checkChanges() {
         });
         Logger.log("Mail sent (" + title + ", " + newVal + ")");
       }
-      sheet.getRange(timeRow, i).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
+      sheet.getRange(i, timeCol).setValue(new Date()).setNumberFormat("yyyy-MM-dd HH:mm:ss");
     }
     i++;
   }
