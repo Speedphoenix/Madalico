@@ -30,15 +30,6 @@ For each site (column) the cells correspond from top to bottom:
 - The time and date of last non-error fetch, how recent the last value you have is
 - The latest error encountered (usually the web page could not be fetched)
 
--|A|B
--|-|-
-1|Title (optional):|Changes to the title Madalico in the repository name on github 
-2|Url:|https://github.com/Speedphoenix/Madalico
-3|Path:|/html/body/div[4]/div/main/div[1]/div/h1/strong/a
-4|Latest value:|Madalico
-5|Time of last non-error fetch:|2019-04-27 13:53:32
-6|Latest error:|
-
 See [this spreadsheet](https://docs.google.com/spreadsheets/d/1MasTLf3-_XS-Ji0UNaEkb3-qaARx6gpOF40jDxPph88/edit#gid=0) as an example
 
 [//]: # (The name Madalico was adopted after finding out that "mabadiliko" means "change" in Swahili)
